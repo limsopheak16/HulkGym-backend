@@ -6,9 +6,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from "typeorm";
 import { RoleEnum } from "../common/types/enum";
 import { Activity } from "./activity.entity";
+import { Exercise } from "./exercise.entity";
 
 @Entity({ name: "user_info" })
 export class UserInfo {
@@ -43,4 +46,8 @@ export class UserInfo {
 
   @OneToMany(() => Activity, (activity) => activity.user)
   activities: Activity[]; // One user can have many activities
+
+  @ManyToMany(() => Exercise)
+  @JoinTable()
+  exercise: Exercise[];
 }
