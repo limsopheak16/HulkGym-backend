@@ -16,6 +16,7 @@ import axios from "axios";
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.TELEGRAM_TOKEN || "";
 
+
 var corsOptions = {
   origin: "*",
 };
