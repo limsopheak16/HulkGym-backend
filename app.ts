@@ -81,6 +81,8 @@ bot.onText(/\/contact/, (msg) => {
 });
 
 bot.onText(/\/promotion/, (msg) => {
+
+
   bot.sendMessage(
     msg.chat.id,
     "Check out our latest promotions at https://example.com/promotions"
