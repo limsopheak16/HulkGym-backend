@@ -4,4 +4,6 @@ node_modules/
 build/
 tmp/
 temp/
-.env.dev
+.env.dev/
+compose.dev.yml/
+docker-compose.yml/
