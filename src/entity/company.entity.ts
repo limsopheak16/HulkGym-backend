@@ -42,4 +42,5 @@ export class CompanyInfo {
   @OneToMany(() => UserInfo, (user_info) => user_info)
   users: UserInfo[];
 
+
 }

@@ -46,6 +46,5 @@ export class Exercise {
   @ManyToMany(() => UserInfo)
   @JoinTable()
   user_info: UserInfo[];
-
   
 }

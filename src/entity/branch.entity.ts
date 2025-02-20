@@ -6,6 +6,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   JoinColumn,
 } from "typeorm";
@@ -43,5 +45,7 @@ export class Branch {
   @OneToMany(() => Announcement, (announcement) => announcement)
   announcements: Announcement[];
 
-  //branch to promotion many to many
+  // @ManyToMany(() => Promotion)
+  // @JoinTable()
+  // user_info: UserInfo[];
 }

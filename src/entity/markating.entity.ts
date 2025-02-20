@@ -1,6 +1,8 @@
-// Marketing.entity.ts
+
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Survey } from "./survey.entity";
+
+@Entity({ name: "marketing" })
 export class Marketing {
   @PrimaryGeneratedColumn()
   id: number;
@@ -11,6 +13,6 @@ export class Marketing {
   @Column({ nullable: true })
   description: string;
 
-  @OneToMany(() => Survey, survey => survey.marketing_id)
+  @OneToMany(() => Survey, survey => survey)
   surveys: Survey[];
 }
