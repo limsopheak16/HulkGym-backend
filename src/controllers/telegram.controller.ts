@@ -26,22 +26,22 @@ export const checkTelegramData = async (req: Request, res: Response) => {
     const isValid = validateTelegramData(initData, TELEGRAM_TOKEN || "");
     if (isValid) {
       console.log("Data is valid")
-      const validUser = await userRepo.findOne({ where: { userEmail: userId} });
+      const validUser = await userRepo.findOne({ where: { email: userId} });
       if (validUser) {
-        const token = generateToken({ id: validUser.id, role: validUser.role as RoleType });
+        const token = generateToken({ id: validUser.id.toString(), role:"member" as RoleType });
         console.log("Token1: ", token)
         return res.status(200).json({ message: "User authenticated.", token });
       }
 
       const user = new UserInfo();
-      user.name = firstName;
-      user.userEmail = userId;
-      user.userContact = userName;
+      user.fullname = firstName;
+      user.id = userId;
+      user.email = userName;
       user.password = "";
 
       await userRepo.save(user);
 
-      const token = generateToken({ id: user.id, role: RoleEnum[2] });
+      const token = generateToken({ id: user.id.toString(), role: RoleEnum[2] });
       console.log("Token2: ", token)
 
       return res.status(200).json({ message: "User created successfully", token});

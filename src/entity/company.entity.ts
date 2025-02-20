@@ -21,15 +21,6 @@ export class CompanyInfo {
   @Column({ type: "varchar", length: 50, nullable: false })
   company_name: string;
 
-  @Column({ type: "varchar", length: 50, nullable: false })
-  email: string;
-
-  @Column({ type: "varchar", length: 50, nullable: false })
-  phone_number: string;
-
-  @Column({ type: "varchar", length: 50, nullable: false })
-  location: string;
-
   @CreateDateColumn()
   createdAt: Date;
 
