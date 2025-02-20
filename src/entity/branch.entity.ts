@@ -14,6 +14,7 @@ import {
 import { CompanyInfo } from "./company.entity";
 import { ContactInfo } from "./contact.entity";
 import { Announcement } from "./annoucement.entity";
+import { Promotion } from "./promotion";
 
 @Entity({ name: "branch" })
 export class Branch {
@@ -33,7 +34,7 @@ export class Branch {
   createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date; 
+  updatedAt: Date;
 
   @ManyToOne(() => CompanyInfo, (company) => company)
   @JoinColumn({ name: "company_id" })
@@ -45,7 +46,6 @@ export class Branch {
   @OneToMany(() => Announcement, (announcement) => announcement)
   announcements: Announcement[];
 
-  // @ManyToMany(() => Promotion)
-  // @JoinTable()
-  // user_info: UserInfo[];
+  @OneToMany(() => Promotion, (promotion) => promotion)
+  promotions: Promotion[];
 }

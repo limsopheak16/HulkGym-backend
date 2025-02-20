@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Promotion } from './promotion';
+import { UserInfo } from './user.entity';
 
 @Entity('membership')
 export class Membership {
@@ -26,5 +27,8 @@ export class Membership {
   @ManyToOne(() => Promotion, (promotion) => promotion.memberships)
   @JoinColumn({ name: 'promotion_id' }) 
   promotion: Promotion;
+
+  @ManyToOne(() => UserInfo, (user_info) => user_info)
+  @JoinColumn({ name: 'user_id' }) 
+  users: Promotion;
 }
-// Membership have relationship with user ManyToMany

@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne,JoinColumn, OneToMany } from 'typeorm';
 import { Membership } from './membership';
+import { Branch } from './branch.entity';
 
 @Entity('promotion')
 export class Promotion {
@@ -21,5 +22,9 @@ export class Promotion {
 
   @OneToMany(() => Membership, (membership) => membership)
   memberships: Membership[];
+
+  @ManyToOne(() => Branch, (branch) => branch)
+  @JoinColumn({ name: 'branch_id' }) 
+  branch: Branch;
+
 }
-// Promotion have relationship with brand ManyToMany
