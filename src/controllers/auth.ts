@@ -6,15 +6,15 @@ import { RoleEnum, RoleType } from '../common';
 
 export const register = async (req: Request, res: Response) => {
   const userRepo = AppDataSource.getRepository(UserInfo);
-  const { name, email, password } = req.body;
+  const { fullname, email, password } = req.body;
 
-  if (!name || !email || !password) {
+  if (!fullname || !email || !password) {
     return res.status(500).json({
       message: "something wrong",
     });
   }
 
-  const validUser = await userRepo.findOne({ where: { userEmail: email } });
+  const validUser = await userRepo.findOne({ where: { email } });
   if (validUser) {
     return res.status(400).json({
       message: "user already exist!",
@@ -23,13 +23,13 @@ export const register = async (req: Request, res: Response) => {
 
   const hashPassword = await encryptPassword(password);
   const user = new UserInfo();
-  user.name = name;
-  user.userEmail = email;
+  user.fullname = fullname;
+  user.email = email;
   user.password = hashPassword;
 
   await userRepo.save(user);
 
-  const token = generateToken({ id: user.id, role: RoleEnum[2] });
+  const token = generateToken({ id: user.id.toString(), role: RoleEnum[2] });
 
   return res
     .status(200)
@@ -45,7 +45,7 @@ export const login = async (req: Request, res: Response) => {
       });
     }
     const userRepo = AppDataSource.getRepository(UserInfo);
-    const user = await userRepo.findOne({ where: { userEmail :email } });
+    const user = await userRepo.findOne({ where: { email } });
 
     if (!user) {
       return res.status(400).json({
@@ -63,7 +63,7 @@ export const login = async (req: Request, res: Response) => {
     if (!user || !isPasswordValid) {
       return res.status(404).json({ message: "User not found" });
     }
-    const token = generateToken({ id: user.id, role: user.role as RoleType });
+    const token = generateToken({ id: user.id.toString(), role: "member" as RoleType });
     return res.status(200).json({ message: "Login Successfully", token });
   } catch (error) {
     console.error(error);
