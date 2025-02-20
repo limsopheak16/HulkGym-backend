@@ -30,4 +30,5 @@ export class ContactInfo {
   @ManyToOne(() => Branch, (branch) => branch.contacts)
   @JoinColumn({ name: "branch_id" })
   branch: Branch;
+  
 }

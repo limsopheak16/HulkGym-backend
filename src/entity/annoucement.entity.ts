@@ -30,4 +30,5 @@ export class Announcement {
   @ManyToOne(() => Branch, (branch) => branch)
   @JoinColumn({ name: "branch_id" })
   branch: Branch[];
+  
 }

@@ -3,6 +3,8 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  ManyToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
@@ -12,20 +14,14 @@ import {
 import { RoleEnum } from "../common/types/enum";
 import { Activity } from "./activity.entity";
 import { Survey } from "./survey.entity";
-
 import { Exercise } from "./exercise.entity";
-
+import { Coupon } from "./coupon.entity";
+import { CompanyInfo } from "./company.entity";
 
 @Entity({ name: "user_info" })
 export class UserInfo {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ nullable: true })
-  company_id: number;
-
-  @Column({ nullable: true })
-  workout_id: number;
 
   @Column()
   fullname: string;
@@ -38,13 +34,22 @@ export class UserInfo {
 
   @Column()
   password: string;
-  
-  @OneToMany(() => Survey, survey => survey.user)
+
+  @OneToMany(() => Survey, (survey) => survey)
   surveys: Survey[];
+
   @OneToMany(() => Activity, (activity) => activity.user)
-  activities: Activity[]; // One user can have many activities
+  activities: Activity[];
 
   @ManyToMany(() => Exercise)
   @JoinTable()
   exercise: Exercise[];
+
+  @ManyToOne(() => Coupon, (coupon) => coupon)
+  @JoinColumn({ name: "coupon_id" })
+  coupons: Coupon;
+
+  @ManyToOne(() => CompanyInfo, (company_info) => company_info)
+  @JoinColumn({ name: "company_id" })
+  company: CompanyInfo;
 }
