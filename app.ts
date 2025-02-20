@@ -16,6 +16,7 @@ import axios from "axios";
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.TELEGRAM_TOKEN || "";
 
+
 var corsOptions = {
   origin: "*",
 };
@@ -81,6 +82,8 @@ bot.onText(/\/contact/, (msg) => {
 });
 
 bot.onText(/\/promotion/, (msg) => {
+
+
   bot.sendMessage(
     msg.chat.id,
     "Check out our latest promotions at https://example.com/promotions"
