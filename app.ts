@@ -12,6 +12,7 @@ import activity from "./src/routes/activity";
 import telegramBot from "node-telegram-bot-api";
 import { handleMessage } from "./src/service/telegram.service";
 import workoutplan from "./src/routes/workoutplan";
+import { WorkoutPlan } from "./src/entity/workoutPlan";
 import axios from "axios";
 import CreatePromotion from "./src/routes/promotion"
 // replace the value below with the Telegram token you receive from @BotFather
@@ -55,6 +56,7 @@ const commands = [
   { command: "/list", description: "Send a list" },
   { command: "/table", description: "Send a table" },
   { command: "/options", description: "Send options" },
+  { command: "/workoutplans", description: "Send workplans" },
 ];
 
 // Set bot commands in Telegram
@@ -72,6 +74,27 @@ bot.onText(/\/start/, (msg) => {
   bot.sendMessage(chatId, response);
 });
 
+bot.onText(/\/workoutplans/, async (msg) => {
+  const chatId = msg.chat.id;
+  try {
+    const workPlans = await AppDataSource.getRepository(WorkoutPlan)
+      .createQueryBuilder("workoutplan")
+      .take(10)
+      .getMany();
+      
+    let message = "Workout Plans:\n\n"; 
+    workPlans.forEach((workPlan, index) => { 
+      // Remove "Workout Plan" from the name if it's at the end
+      const cleanedName = workPlan.name.replace(/ Workout Plan$/, ''); // Removes "Workout Plan" if it's at the end
+      message += `Name: ${cleanedName}\n`;  
+    });
+
+    bot.sendMessage(chatId, message);
+  } catch (error) {
+    bot.sendMessage(chatId, "Error fetching workout plans");
+  }
+});
+
 // Handle other commands
 bot.onText(/\/help/, (msg) => {
   bot.sendMessage(
@@ -85,8 +108,6 @@ bot.onText(/\/contact/, (msg) => {
 });
 
 bot.onText(/\/promotion/, (msg) => {
-
-
   bot.sendMessage(
     msg.chat.id,
     "Check out our latest promotions at https://example.com/promotions"

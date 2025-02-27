@@ -1,14 +1,13 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../config";
-import { WorkoutPlan } from "../entity/workoutPlan";
+import { Workout } from "../entity/workout.entity";
 
 export const getWorkoutplan = async (req: Request, res: Response) => {
   try {
-    const workoutPlanRepo = AppDataSource.getRepository(WorkoutPlan);
-    const workouts = await workoutPlanRepo.find({
+    const workoutRepo = AppDataSource.getRepository(Workout);
+    const workouts = await workoutRepo.find({
       select: [
         "id",
-        "name"
       ],
     });
 

@@ -1,12 +1,10 @@
 import { Router } from "express";
-import { createWorkoutPlan } from "../controllers/workoutPlan.controller";
+import { getWorkoutplan } from "../controllers/workoutPlan.controller";
 import protectRoute from "../middleware/auth";
+import { RoleEnum } from "../common";
 
 const router = Router();
 
-router.post("/workoutPlan", protectRoute(), createWorkoutPlan);
+router.get("/get", protectRoute(Object.values(RoleEnum)), getWorkoutplan);
 
 export default router;
-
-
-
