@@ -19,19 +19,19 @@ export class Exercise {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ type: "varchar", length: 30, nullable: false })
+  @Column({ type: "varchar", length: 250, nullable: false })
   name: string;
 
   @Column({ type: "int", nullable: false })
   sets: number;
 
-  @Column({ type: "int", nullable: true })
-  weight_lbs: number;
+@Column({ type: "varchar", length: 250, nullable: true })
+weight_lbs: string;
 
-  @Column({ type: "varchar", length: 30, nullable: false })
+  @Column({ type: "varchar", length: 250, nullable: false })
   reps: string;
 
-  @Column({ type: "varchar", length: 30, nullable: false })
+  @Column({ type: "varchar", length: 250, nullable: false })
   calories: string;
 
   @CreateDateColumn()
@@ -48,3 +48,6 @@ export class Exercise {
   user_info: UserInfo[];
   
 }
+
+
+
