@@ -89,3 +89,5 @@ docker compose --env-file .env.dev -f compose.dev.yml up -d --build
 npm run migration:generate
 npm run migration:run
 ```
+sudo pkill -9 docker
+sudo systemctl restart docker

@@ -1,31 +1,30 @@
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    OneToMany
-  }from 'typeorm';
+
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
 import { UserInfo } from "./user.entity";
-
-@Entity({ name: "coupon" })
+@Entity()
 export class Coupon {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ type: 'varchar',length: 50 })
-    name: string;
+  @Column({ type: 'uuid' }) // Make sure this is 'string' for UUID
+  user_id: string;
 
-    @Column({ type: 'varchar',length: 50 })
-    duration: string;
+  @Column({ type: 'varchar', length: 50 })
+  name: string;
 
-    @Column({type: 'varchar', length: 50 })
-    offer: string;
+  @Column({ type: 'varchar', length: 50 })
+  duration: Date;
 
-    @Column({ type: 'varchar',length: 50 })
-    valid_until: string;
+  @Column({ type: 'varchar', length: 50 })
+  offer: Date;
 
-    @Column({ type: 'varchar',length: 50 })
-    terms: string;
+  @Column({ type: 'varchar', length: 50 })
+  valid_until: Date;
 
-    @OneToMany(() => UserInfo, (user_info) => user_info)
-    users: UserInfo[];
-}
+  @Column({ type: 'varchar', length: 50 })
+  terms: Date;
+ @ManyToOne(() => UserInfo, userInfo => userInfo.activities)
+ @JoinColumn({ name: "user_id" })
+ user: UserInfo;
+} 
+

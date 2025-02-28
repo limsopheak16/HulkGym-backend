@@ -5,23 +5,26 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
   OneToMany,
   ManyToMany,
   JoinTable,
 } from "typeorm";
-import { RoleEnum } from "../common/types/enum";
 import { Activity } from "./activity.entity";
 import { Survey } from "./survey.entity";
 import { Exercise } from "./exercise.entity";
 import { Coupon } from "./coupon.entity";
 import { CompanyInfo } from "./company.entity";
 
-@Entity({ name: "user_info" })
+@Entity()
 export class UserInfo {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid') // UUID will be a string
+  id: string;
+
+  @Column({ nullable: true })
+  company_id: number;
+
+  @Column({ nullable: true })
+  workout_id: number;
 
   @Column()
   fullname: string;
@@ -34,8 +37,8 @@ export class UserInfo {
 
   @Column()
   password: string;
+  @OneToMany(() => Survey, survey => survey.user)
 
-  @OneToMany(() => Survey, (survey) => survey)
   surveys: Survey[];
 
   @OneToMany(() => Activity, (activity) => activity.user)
