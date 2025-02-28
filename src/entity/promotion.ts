@@ -26,5 +26,6 @@ export class Promotion {
   @ManyToOne(() => Branch, (branch) => branch)
   @JoinColumn({ name: 'branch_id' }) 
   branch: Branch;
+  //
 
 }
