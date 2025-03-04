@@ -1,4 +1,4 @@
-import express from "express";
+import express, { application } from "express";
 const app = express();
 import auth from "./src/routes/auth";
 import { AppDataSource } from "./src/config/data-source";
@@ -14,7 +14,8 @@ import { handleMessage } from "./src/service/telegram.service";
 import workoutplan from "./src/routes/workoutplan";
 import { WorkoutPlan } from "./src/entity/workoutPlan";
 import axios from "axios";
-import CreatePromotion from "./src/routes/promotion"
+import { Workout } from "./src/entity/workout.entity";
+import { Exercise } from "./src/entity/exercise.entity";
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.TELEGRAM_TOKEN || "";
 
@@ -34,7 +35,7 @@ app.use(bodyParser.json());
 const swaggerSpec = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Routes setuphttps://fboxmschac.sharedwithexpose.com
+// Routes setup
 app.use("/api/auth", auth);
 app.use("/api/activity", activity);
 app.use("/api/workoutPlan", workoutplan);
@@ -56,7 +57,7 @@ const commands = [
   { command: "/list", description: "Send a list" },
   { command: "/table", description: "Send a table" },
   { command: "/options", description: "Send options" },
-  { command: "/workoutplans", description: "Send workplans" },
+  { command: "/workoutplan", description: "Send workplan" },
 ];
 
 // Set bot commands in Telegram
@@ -74,26 +75,145 @@ bot.onText(/\/start/, (msg) => {
   bot.sendMessage(chatId, response);
 });
 
-bot.onText(/\/workoutplans/, async (msg) => {
-  const chatId = msg.chat.id;
+// /workout_plan command
+bot.onText(/\/workoutplan/, async (msg) => {
   try {
-    const workPlans = await AppDataSource.getRepository(WorkoutPlan)
-      .createQueryBuilder("workoutplan")
-      .take(10)
-      .getMany();
-      
-    let message = "Workout Plans:\n\n"; 
-    workPlans.forEach((workPlan, index) => { 
-      // Remove "Workout Plan" from the name if it's at the end
-      const cleanedName = workPlan.name.replace(/ Workout Plan$/, ''); // Removes "Workout Plan" if it's at the end
-      message += `Name: ${cleanedName}\n`;  
-    });
+    const workoutplans: { id: number; name: string }[] = await AppDataSource.query('SELECT * FROM public."workoutPlan"');
+    console.log(workoutplans)
 
-    bot.sendMessage(chatId, message);
-  } catch (error) {
-    bot.sendMessage(chatId, "Error fetching workout plans");
+    if (workoutplans.length === 0) {
+      return bot.sendMessage(msg.chat.id, "No workout plans found.");
+    }
+
+    const display = workoutplans.map((workout) => [
+      {
+        text: `🔥 ${workout.name}`,
+        callback_data: `workoutPlan_${workout.id}`,
+      },
+    ]);
+
+    bot.sendMessage(msg.chat.id, "Choose a Workout Plan:", {
+      reply_markup: {
+        inline_keyboard: display,
+      },
+    });
+  } catch (err) {
+    console.error("Error fetching workout plans:", err);
+    bot.sendMessage(msg.chat.id, "Failed to fetch workout plans. Please try again later.");
   }
 });
+
+bot.on("callback_query", async (callbackQuery) => {
+  const msg = callbackQuery.message;
+  const data = callbackQuery.data;
+
+  if (!msg || !data) {
+    return bot.sendMessage(callbackQuery.from.id, "Invalid selection. Please try again.");
+  }
+
+  if (data.startsWith("workoutPlan_")) {
+    const workoutplanId = data.split("_")[1]; // Extract workoutPlan_id
+
+    try {
+      const workouts: { id: number; type: string }[] = await AppDataSource.query(
+        `SELECT * FROM public."workout" WHERE "workoutPlan_id" = '${workoutplanId}'`
+      );
+      console.log(workouts);
+
+      if (workouts.length === 0) {
+        return bot.sendMessage(msg.chat.id, "No workouts found for this plan.");
+      }
+
+      // Create inline buttons for each workout
+      const buttons = workouts.map((workout) => [
+        {
+          text: `${workout.type}`,
+          callback_data: `workout_${workout.id}`, // Ensure consistency
+        },
+      ]);
+
+      bot.sendMessage(msg.chat.id, `Workouts in this plan:`, {
+        reply_markup: {
+          inline_keyboard: buttons,
+        },
+      });
+    } catch (err) {
+      console.error("Error fetching workouts:", err);
+      bot.sendMessage(msg.chat.id, "Failed to fetch workouts. Please try again later.");
+    }
+  }
+});
+
+bot.on("callback_query", async (callbackQuery) => {
+  const msg = callbackQuery.message;
+  const data = callbackQuery.data;
+
+  if (!msg || !data) {
+    return bot.sendMessage(callbackQuery.from.id, "Invalid selection. Please try again.");
+  }
+
+  if (data.startsWith("workout_")) {
+    const workoutId = data.split("_")[1]; // Extract workoutPlan_id
+
+    try {
+      const exercises: { id: number; name: string; }[] = await AppDataSource.query(
+        `SELECT * FROM public.exercise WHERE "workout_id" = '${workoutId}'`
+      );
+      console.log(exercises);
+
+      if (exercises.length === 0) {
+        return bot.sendMessage(msg.chat.id, "No exercises found for this plan.");
+      }
+
+      // Create inline buttons for each workout
+      const buttons = exercises.map((exercise) => [
+        {
+          text: `${exercise.name}`,
+          callback_data: `exercise_${exercise.id}`, 
+        },
+      ]);
+
+      bot.sendMessage(msg.chat.id, `Exercises in this plan:`, {
+        reply_markup: {
+          inline_keyboard: buttons,
+        },
+      });
+    } catch (err) {
+      console.error("Error fetching exercise:", err);
+      bot.sendMessage(msg.chat.id, "Failed to fetch exercise. Please try again later.");
+    }
+  }
+
+  if (data.startsWith("exercise_")) {
+    const exerciseId = data.split("_")[1]; // Extract exercise_id
+
+    try {
+      const exerciseDetails: { id: number; name: string; sets: number; weight_lbs: string; reps: string; calories: string }[] = await AppDataSource.query(
+        `SELECT * FROM public.exercise WHERE id = '${exerciseId}'`
+      );
+
+      if (exerciseDetails.length === 0) {
+        return bot.sendMessage(msg.chat.id, "Exercise not found.");
+      }
+
+      const exercise = exerciseDetails[0]; 
+
+      bot.sendMessage(msg.chat.id, 
+        `*Exercise: ${exercise.name}*\n\n` +
+        `Sets: ${exercise.sets}\n` +
+        `Weight (lbs): ${exercise.weight_lbs}\n` +
+        `Reps: ${exercise.reps}\n` +
+        `Calories Burned: ${exercise.calories}`,
+        { parse_mode: "Markdown" }
+      );
+
+    } catch (err) {
+      console.error("Error fetching exercise details:", err);
+      bot.sendMessage(msg.chat.id, "Failed to fetch exercise details. Please try again later.");
+    }
+  }
+});
+
 
 // Handle other commands
 bot.onText(/\/help/, (msg) => {
@@ -103,6 +223,7 @@ bot.onText(/\/help/, (msg) => {
   );
 });
 
+// Handle /contact command
 bot.onText(/\/contact/, (msg) => {
   bot.sendMessage(msg.chat.id, "You can contact us at support@example.com.");
 });
@@ -160,7 +281,7 @@ bot.onText(/\/table/, (msg) => {
   });
 });
 
-// Listen for any kind of message. There are different kinds of
+// Listen for any kind of message.
 bot.on("message", (msg) => {
   try {
     const chatId = msg.chat.id;
@@ -211,16 +332,3 @@ AppDataSource.initialize()
     });
   })
   .catch((error) => console.log(error));
-
-export const getDataSource = (delay = 3000): Promise<DataSource> => {
-  if (AppDataSource.isInitialized) return Promise.resolve(AppDataSource);
-
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (AppDataSource.isInitialized) resolve(AppDataSource);
-      else reject("Failed to create connection with database");
-    }, delay);
-  });
-};
-
-export default app;
