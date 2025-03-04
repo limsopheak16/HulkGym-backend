@@ -16,7 +16,6 @@ import { WorkoutPlan } from "./src/entity/workoutPlan";
 import axios from "axios";
 import { Workout } from "./src/entity/workout.entity";
 import { Exercise } from "./src/entity/exercise.entity";
-
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.TELEGRAM_TOKEN || "";
 
@@ -40,6 +39,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", auth);
 app.use("/api/activity", activity);
 app.use("/api/workoutPlan", workoutplan);
+app.use("/api/promotion", CreatePromotion);
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new telegramBot(token, { polling: true });
